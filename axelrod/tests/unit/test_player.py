@@ -1,6 +1,8 @@
 import random
 import unittest
 
+import numpy as np
+
 import axelrod
 from axelrod import DefaultGame, Player, simulate_play
 
@@ -126,7 +128,7 @@ def test_responses(test_class, P1, P2, history_1, history_2, responses,
     by player one to test.
     """
 
-    if random_seed:
+    if random_seed is not None:
         axelrod.seed(random_seed)
     # Force the histories, In case either history is impossible or if some
     # internal state needs to be set, actually submit to moves to the strategy
@@ -217,7 +219,10 @@ class TestPlayer(unittest.TestCase):
         self.assertEqual(self.player().state_distribution, {})
 
         for k, v in p_clone.__dict__.items():
-            self.assertEqual(v, getattr(p_clone, k))
+            try:
+                self.assertEqual(v, getattr(p_clone, k))
+            except ValueError:
+                self.assertTrue(np.array_equal(v, getattr(p_clone, k)))
 
     def test_clone(self):
         # Test that the cloned player produces identical play
